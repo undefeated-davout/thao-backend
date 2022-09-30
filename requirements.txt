@@ -1,0 +1,2 @@
+pyocr
+Pillow

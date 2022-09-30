@@ -1,0 +1,17 @@
+{
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.lintOnSave": true,
+  "python.formatting.provider": "black",
+  "python.formatting.blackArgs": ["--line-length", "79"],
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
+  "python.linting.flake8Args": ["--per-file-ignores=\"__init__.py:F401\" ."],
+  "python.analysis.extraPaths": ["./app"],
+  "[python]": {
+    "editor.defaultFormatter": null,
+    "editor.formatOnSave": true
+  }
+}
