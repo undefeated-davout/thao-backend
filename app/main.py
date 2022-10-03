@@ -35,7 +35,6 @@ def main():
     with ProcessPoolExecutor(max_workers=5) as executor:
         results = executor.map(exec_ocr, file_paths)
         print("タスクセット完了")
-    # print(list(results))
     for i, result in enumerate(list(results)):
         print("-----")
         print(str(i + 1) + "個目")
