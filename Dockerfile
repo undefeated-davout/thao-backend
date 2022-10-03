@@ -1,4 +1,4 @@
-FROM python:3.10.5-slim-bullseye
+FROM python:3.10.7-slim-bullseye
 
 RUN apt update && apt install --no-install-recommends -y \
     bash \
