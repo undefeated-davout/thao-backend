@@ -2,6 +2,7 @@ FROM python:3.10.7-slim-bullseye
 
 RUN apt update && apt install --no-install-recommends -y \
     bash \
+    git \
     tesseract-ocr \
     libtesseract-dev \
   && apt-get clean \

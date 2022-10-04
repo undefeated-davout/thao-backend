@@ -6,3 +6,4 @@ services:
     tty: true
     volumes:
       - .:/opt/app/src
+    env_file: ./envs/.env

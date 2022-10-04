@@ -1,10 +1,12 @@
 # -*- coding: utf-8
 import glob
+import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
 import pyocr
 import pyocr.builders
+import requests
 from PIL import Image
 
 input_dir = "./data/"
@@ -34,15 +36,42 @@ def exec_ocr(image):
     return txt
 
 
+def call_translate_api(org_texts):
+    payload = {
+        "auth_key": os.environ["TRANSLATE_API_KEY"],
+        "text": org_texts,
+        "target_lang": "JA",
+    }
+
+    try:
+        res = requests.post(os.environ["TRANSLATE_API_URL"], data=payload)
+        result = res.json()
+        return result
+    # エラーハンドリング
+    except urllib.error.HTTPError as e:
+        return "error"
+    except urllib.error.URLError as e:
+        return "error"
+
+
+def conv_translate_api_response(translate_api_response):
+    texts = [row["text"] for row in translate_api_response["translations"]]
+    return texts
+
+
 def main():
     # 画像一覧取得
     file_paths = glob.glob(input_dir + "*.jpg")
     print("ファイル数: " + str(len(file_paths)))
     images = [Image.open(file_path) for file_path in file_paths]
 
-    ocr_results = exec_ocr_pallarel(images)
+    # OCR実行
+    ocr_texts = exec_ocr_pallarel(images)
 
-    for i, result in enumerate(ocr_results):
+    translate_api_res = call_translate_api(ocr_texts)
+    translate_results = conv_translate_api_response(translate_api_res)
+
+    for i, result in enumerate(translate_results):
         print("-----")
         print(str(i + 1) + "個目")
         print("-----")
