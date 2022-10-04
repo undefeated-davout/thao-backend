@@ -1,6 +1,5 @@
 # -*- coding: utf-8
 import glob
-import os
 import sys
 from concurrent.futures import ProcessPoolExecutor
 
@@ -20,22 +19,30 @@ def get_tool():
     return tool
 
 
-def exec_ocr(file_path):
-    img = Image.open(file_path)
+def exec_ocr_pallarel(images):
+    with ProcessPoolExecutor(max_workers=5) as executor:
+        # OCR実行
+        results = executor.map(exec_ocr, images)
+        print("タスクセット完了")
+    return list(results)
+
+
+def exec_ocr(image):
     tool = get_tool()
     builder = pyocr.builders.TextBuilder()
-    txt = tool.image_to_string(img, lang="eng", builder=builder)
+    txt = tool.image_to_string(image, lang="eng", builder=builder)
     return txt
 
 
 def main():
+    # 画像一覧取得
     file_paths = glob.glob(input_dir + "*.jpg")
     print("ファイル数: " + str(len(file_paths)))
+    images = [Image.open(file_path) for file_path in file_paths]
 
-    with ProcessPoolExecutor(max_workers=5) as executor:
-        results = executor.map(exec_ocr, file_paths)
-        print("タスクセット完了")
-    for i, result in enumerate(list(results)):
+    ocr_results = exec_ocr_pallarel(images)
+
+    for i, result in enumerate(ocr_results):
         print("-----")
         print(str(i + 1) + "個目")
         print("-----")
