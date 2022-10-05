@@ -9,7 +9,8 @@ import pyocr.builders
 import requests
 from PIL import Image
 
-input_dir = "./data/"
+INPUT_DIR = "./data/"
+MAX_WORKERS = 5
 
 
 def get_tool():
@@ -22,16 +23,17 @@ def get_tool():
 
 
 def exec_ocr_pallarel(images):
-    with ProcessPoolExecutor(max_workers=5) as executor:
+    builder = pyocr.builders.TextBuilder()
+    image_count = len(images)
+    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as executor:
         # OCR実行
-        results = executor.map(exec_ocr, images)
+        results = executor.map(exec_ocr, [builder] * image_count, images)
         print("タスクセット完了")
     return list(results)
 
 
-def exec_ocr(image):
+def exec_ocr(builder, image):
     tool = get_tool()
-    builder = pyocr.builders.TextBuilder()
     txt = tool.image_to_string(image, lang="eng", builder=builder)
     return txt
 
@@ -48,9 +50,7 @@ def call_translate_api(org_texts):
         result = res.json()
         return result
     # エラーハンドリング
-    except urllib.error.HTTPError as e:
-        return "error"
-    except urllib.error.URLError as e:
+    except:
         return "error"
 
 
@@ -61,7 +61,7 @@ def conv_translate_api_response(translate_api_response):
 
 def main():
     # 画像一覧取得
-    file_paths = glob.glob(input_dir + "*.jpg")
+    file_paths = glob.glob(INPUT_DIR + "*.jpg")
     print("ファイル数: " + str(len(file_paths)))
     images = [Image.open(file_path) for file_path in file_paths]
 
